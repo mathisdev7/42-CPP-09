@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:05:56 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/03/01 20:01:18 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/03/02 11:53:19 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 #include <cstring>
 #include <map>
 #include <string>
+#include <sstream>
+#include <algorithm>
+#include <functional>
 
 class FileNotFoundException: public std::exception
 {
@@ -34,6 +37,8 @@ virtual const char* what() const throw()
 };
 
 void retrieveData(std::string input);
+void processData(std::string line);
+void retrieveMyData(std::string filePath, std::function<void (std::string, std::string)> insertData);
 template <typename T, typename Y>
 
 class BitcoinExchange
@@ -42,8 +47,19 @@ class BitcoinExchange
     std::map<T, Y> data;
     BitcoinExchange() {};
     public:
+    static void insertData(std::string date, std::string value)
+    {
+        std::istringstream iss(value);
+        Y numericValue;
+
+        if (!(iss >> numericValue)) {
+            throw FileContentWrong();
+        }
+        data.insert(std::make_pair(date, numericValue));
+    }
     BitcoinExchange(std::string input) 
     {
+        retrieveMyData("data.csv", insertData);
         retrieveData(input); 
     };
     ~BitcoinExchange() {};
