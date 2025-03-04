@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:05:56 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/03/02 11:53:19 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/03/03 15:40:09 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,47 +20,32 @@
 #include <algorithm>
 #include <functional>
 
-class FileNotFoundException: public std::exception
+class FileNotFoundException : public std::exception
 {
-virtual const char* what() const throw()
-{
-    return "File not found.";
-}
+	virtual const char *what() const throw()
+	{
+		return "File not found.";
+	}
 };
 
-class FileContentWrong: public std::exception
+class FileContentWrong : public std::exception
 {
-virtual const char* what() const throw()
-{
-    return "File content must have this pattern: date | value.";
-}
+	virtual const char *what() const throw()
+	{
+		return "File content must have this pattern: date | value.";
+	}
 };
-
-void retrieveData(std::string input);
-void processData(std::string line);
-void retrieveMyData(std::string filePath, std::function<void (std::string, std::string)> insertData);
-template <typename T, typename Y>
-
 class BitcoinExchange
 {
-    private:
-    std::map<T, Y> data;
-    BitcoinExchange() {};
-    public:
-    static void insertData(std::string date, std::string value)
-    {
-        std::istringstream iss(value);
-        Y numericValue;
+private:
+	std::map<std::string, double> data;
+	BitcoinExchange() {};
 
-        if (!(iss >> numericValue)) {
-            throw FileContentWrong();
-        }
-        data.insert(std::make_pair(date, numericValue));
-    }
-    BitcoinExchange(std::string input) 
-    {
-        retrieveMyData("data.csv", insertData);
-        retrieveData(input); 
-    };
-    ~BitcoinExchange() {};
+public:
+	void insertData(std::string date, std::string value);
+	BitcoinExchange(std::string input);
+	~BitcoinExchange();
+	void retrieveData(std::string input);
+	void processData(std::string line);
+	void retrieveMyData(std::string filePath);
 };
