@@ -6,11 +6,47 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:06:01 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/03/03 15:58:55 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/03/05 10:34:18 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BitcoinExchange.hpp"
+
+bool isLeapYear(int year)
+{
+	return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+bool isValidDate(int day, int month, int year)
+{
+	if (year < 1 || month < 1 || month > 12 || day < 1)
+	{
+		return false;
+	}
+
+	int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+	if (month == 2 && isLeapYear(year))
+	{
+		daysInMonth[1] = 29;
+	}
+
+	return day <= daysInMonth[month - 1];
+}
+
+bool isValidDateString(const std::string &dateStr)
+{
+	if (dateStr.length() != 10 || dateStr[4] != '-' || dateStr[7] != '-')
+	{
+		return false;
+	}
+
+	int year = atoi(dateStr.substr(0, 4).c_str());
+	int month = atoi(dateStr.substr(5, 2).c_str());
+	int day = atoi(dateStr.substr(8, 2).c_str());
+
+	return isValidDate(day, month, year);
+}
 
 BitcoinExchange::BitcoinExchange(std::string input)
 {
@@ -28,10 +64,6 @@ void BitcoinExchange::retrieveData(std::string input)
 		throw FileNotFoundException();
 	while (getline(infile, line))
 	{
-		// if (line.find("|") == std::string::npos)
-		// {
-		//     throw FileContentWrong();
-		// }
 		processData(line);
 	}
 }
@@ -48,10 +80,6 @@ void BitcoinExchange::insertData(std::string date, std::string value)
 		throw FileContentWrong();
 	}
 	data.insert(std::make_pair(date, numericValue));
-	it = data.find("2012-01-11");
-	std::cout << "Date: " << date << ", " << "Value: " << numericValue << std::endl;
-	if (it->first.length() > 0)
-		std::cout << it->first << std::endl;
 }
 void BitcoinExchange::retrieveMyData(std::string filePath)
 {
@@ -106,6 +134,35 @@ void BitcoinExchange::processData(std::string line)
 		std::cout << "Error: No data found for date: " << token << std::endl;
 	else
 	{
-		std::cout << "Date: " << date << ", " << "Value: " << value << std::endl;
+		std::istringstream iss(value);
+		double numericValue;
+		std::map<std::string, double>::iterator it;
+
+		iss >> numericValue;
+		if (numericValue < 0)
+		{
+			std::cout << "Error: not a positive number." << std::endl;
+		}
+		else if (numericValue > 1000)
+			std::cout << "Error: too large a number." << std::endl;
+		else if (!isValidDateString(date))
+		{
+			std::cout << "Error: bad input => " << date << std::endl;
+		}
+		else
+		{
+			std::map<std::string, double>::iterator it = data.lower_bound(date);
+
+			if (it == data.end() || it->first != date)
+			{
+				if (it == data.begin())
+				{
+					std::cout << "Error: No available previous date for " << date << std::endl;
+					return;
+				}
+				--it;
+			}
+			std::cout << date << " => " << numericValue << " = " << it->second * numericValue << std::endl;
+		}
 	}
 }
