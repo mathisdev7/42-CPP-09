@@ -1,31 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   RPN.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/01 19:42:51 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/03/05 14:03:28 by mazeghou         ###   ########.fr       */
+/*   Created: 2025/03/05 10:40:57 by mazeghou          #+#    #+#             */
+/*   Updated: 2025/03/05 12:03:02 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "BitcoinExchange.hpp"
+#include <iostream>
+#include <stack>
+#include <sstream>
+#include <cstdlib>
+#include <cctype>
 
-int main(int argc, char *argv[])
+class RPN
 {
-	if (argc != 2)
-	{
-		std::cout << "Please send an input file\n./btc <filename>" << std::endl;
-		return (0);
-	}
-	std::string fileName = argv[1];
-	try
-	{
-		BitcoinExchange btc(fileName);
-	}
-	catch (std::exception &e)
-	{
-		std::cout << e.what() << std::endl;
-	}
-}
+private:
+	std::stack<int> stack;
+
+public:
+	RPN(std::string expression);
+	~RPN();
+	bool isRPN(const std::string &expression);
+	int evaluateRPN(const std::string &expression);
+};
